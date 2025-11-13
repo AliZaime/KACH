@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KACH-BRIDGE API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 10px;
+            color: #333;
+            overflow-y: auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            padding: 30px;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status::before {
+            content: "●";
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .endpoints {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.get {
+            background: #10b981;
+            color: white;
+        }
+
+        .method.post {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .endpoint-path:hover {
+            color: #764ba2;
+        }
+
+        .endpoint-desc {
+            color: #666;
+            margin-top: 5px;
+            font-size: 0.85em;
+        }
+
+        .test-panel {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .test-panel.active {
+            display: block;
+        }
+
+        .test-form {
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            padding-right: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"] {
+            padding-right: 8px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            color: #667eea;
+            padding: 5px 8px;
+            margin-top: 12px;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .password-toggle:hover {
+            color: #764ba2;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .response.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .response.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .token-info {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+            font-size: 0.8em;
+        }
+
+        .token-info strong {
+            color: #856404;
+        }
+
+        .links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-size: 0.9em;
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .link-btn.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .link-btn.secondary:hover {
+            background: #f8f9fa;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+            color: #999;
+            font-size: 0.8em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .logo {
+                font-size: 2.5em;
+            }
+
+            .links {
+                flex-direction: column;
+            }
+
+            .link-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🌉 KACH-BRIDGE</div>
+            <div class="subtitle">Backend API Multiplateforme</div>
+            <div class="status">API Opérationnelle</div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">📡 Endpoints Disponibles</h2>
+            <div class="endpoints">
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('health')">/api/health/</span>
+                    <div class="endpoint-desc">Vérification de santé de l'API</div>
+                    <div id="test-health" class="test-panel">
+                        <div class="test-form">
+                            <button class="btn btn-primary" onclick="testEndpoint('health')">Tester</button>
+                        </div>
+                        <div id="response-health" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('register')">/api/auth/register/</span>
+                    <div class="endpoint-desc">Inscription d'un nouvel utilisateur</div>
+                    <div id="test-register" class="test-panel">
+                        <div class="test-form">
+                            <div class="form-group">
+                                <label>Username:</label>
+                                <input type="text" id="register-username" placeholder="alizaime">
+                            </div>
+                            <div class="form-group">
+                                <label>Email:</label>
+                                <input type="email" id="register-email" placeholder="ali@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Password:</label>
+                                <input type="password" id="register-password" placeholder="motdepasse123">
+                                <button type="button" class="password-toggle" onclick="togglePassword('register-password', this)">○</button>
+                            </div>
+                            <div class="form-group">
+                                <label>Password Confirm:</label>
+                                <input type="password" id="register-password-confirm" placeholder="motdepasse123">
+                                <button type="button" class="password-toggle" onclick="togglePassword('register-password-confirm', this)">○</button>
+                            </div>
+                            <button class="btn btn-primary" onclick="testEndpoint('register')">Tester</button>
+                        </div>
+                        <div id="response-register" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('login')">/api/auth/login/</span>
+                    <div class="endpoint-desc">Connexion d'un utilisateur</div>
+                    <div id="test-login" class="test-panel">
+                        <div class="test-form">
+                            <div class="form-group">
+                                <label>Username:</label>
+                                <input type="text" id="login-username" placeholder="alizaime">
+                            </div>
+                            <div class="form-group">
+                                <label>Password:</label>
+                                <input type="password" id="login-password" placeholder="motdepasse123">
+                                <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">○</button>
+                            </div>
+                            <button class="btn btn-primary" onclick="testEndpoint('login')">Tester</button>
+                        </div>
+                        <div id="response-login" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('profile')">/api/user/profile/</span>
+                    <div class="endpoint-desc">Profil de l'utilisateur connecté (nécessite authentification)</div>
+                    <div id="test-profile" class="test-panel">
+                        <div class="token-info">
+                            <strong>⚠️ Authentification requise:</strong> Vous devez d'abord vous connecter pour obtenir un token.
+                        </div>
+                        <div class="form-group">
+                            <label>Token d'accès (Bearer Token):</label>
+                            <input type="text" id="profile-token" placeholder="Collez votre token ici">
+                        </div>
+                        <button class="btn btn-primary" onclick="testEndpoint('profile')">Tester</button>
+                        <div id="response-profile" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('logout')">/api/auth/logout/</span>
+                    <div class="endpoint-desc">Déconnexion (nécessite authentification)</div>
+                    <div id="test-logout" class="test-panel">
+                        <div class="token-info">
+                            <strong>⚠️ Authentification requise:</strong> Vous devez d'abord vous connecter pour obtenir un refresh token.
+                        </div>
+                        <div class="form-group">
+                            <label>Refresh Token:</label>
+                            <input type="text" id="logout-refresh-token" placeholder="Collez votre refresh token ici">
+                        </div>
+                        <button class="btn btn-primary" onclick="testEndpoint('logout')">Tester</button>
+                        <div id="response-logout" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path" onclick="toggleTestPanel('refresh')">/api/auth/token/refresh/</span>
+                    <div class="endpoint-desc">Rafraîchir le token d'accès</div>
+                    <div id="test-refresh" class="test-panel">
+                        <div class="form-group">
+                            <label>Refresh Token:</label>
+                            <input type="text" id="refresh-token" placeholder="Collez votre refresh token ici">
+                        </div>
+                        <button class="btn btn-primary" onclick="testEndpoint('refresh')">Tester</button>
+                        <div id="response-refresh" class="response" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="links">
+            <a href="/admin/" class="link-btn secondary">Administration</a>
+        </div>
+
+        <div class="footer">
+            <p>Développé avec ❤️ par <strong>Ali ZAIME</strong></p>
+            <p style="margin-top: 10px;">Django REST Framework • JWT Authentication • CORS Enabled</p>
+        </div>
+    </div>
+
+    <script>
+        let accessToken = '';
+        let refreshToken = '';
+
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '●';
+            } else {
+                input.type = 'password';
+                button.textContent = '○';
+            }
+        }
+
+        function toggleTestPanel(endpoint) {
+            const panel = document.getElementById(`test-${endpoint}`);
+            const isActive = panel.classList.contains('active');
+            
+            // Fermer tous les autres panels
+            document.querySelectorAll('.test-panel').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            // Toggle le panel actuel
+            if (!isActive) {
+                panel.classList.add('active');
+            }
+        }
+
+        async function testEndpoint(endpoint) {
+            const responseDiv = document.getElementById(`response-${endpoint}`);
+            responseDiv.style.display = 'block';
+            responseDiv.className = 'response';
+            responseDiv.textContent = 'Chargement...';
+
+            try {
+                let url, options = {};
+
+                switch(endpoint) {
+                    case 'health':
+                        url = '/api/health/';
+                        options = { method: 'GET' };
+                        break;
+
+                    case 'register':
+                        url = '/api/auth/register/';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: document.getElementById('register-username').value,
+                                email: document.getElementById('register-email').value,
+                                password: document.getElementById('register-password').value,
+                                password_confirm: document.getElementById('register-password-confirm').value
+                            })
+                        };
+                        break;
+
+                    case 'login':
+                        url = '/api/auth/login/';
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: document.getElementById('login-username').value,
+                                password: document.getElementById('login-password').value
+                            })
+                        };
+                        break;
+
+                    case 'profile':
+                        url = '/api/user/profile/';
+                        const token = document.getElementById('profile-token').value || accessToken;
+                        if (!token || token.trim() === '') {
+                            responseDiv.style.display = 'block';
+                            responseDiv.classList.add('error');
+                            responseDiv.textContent = 'Erreur: Aucun token disponible. Veuillez d\'abord vous connecter ou vous inscrire.';
+                            return;
+                        }
+                        options = {
+                            method: 'GET',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        };
+                        break;
+
+                    case 'logout':
+                        url = '/api/auth/logout/';
+                        const refreshTokenValue = document.getElementById('logout-refresh-token').value || refreshToken;
+                        const accessTokenForLogout = accessToken;
+                        if (!refreshTokenValue || refreshTokenValue.trim() === '') {
+                            responseDiv.style.display = 'block';
+                            responseDiv.classList.add('error');
+                            responseDiv.textContent = 'Erreur: Aucun refresh token disponible. Veuillez d\'abord vous connecter ou vous inscrire.';
+                            return;
+                        }
+                        if (!accessTokenForLogout || accessTokenForLogout.trim() === '') {
+                            responseDiv.style.display = 'block';
+                            responseDiv.classList.add('error');
+                            responseDiv.textContent = 'Erreur: Aucun access token disponible. Veuillez d\'abord vous connecter ou vous inscrire.';
+                            return;
+                        }
+                        options = {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${accessTokenForLogout}`
+                            },
+                            body: JSON.stringify({ refresh_token: refreshTokenValue })
+                        };
+                        break;
+
+                    case 'refresh':
+                        url = '/api/auth/token/refresh/';
+                        const refreshTokenInput = document.getElementById('refresh-token').value || refreshToken;
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ refresh: refreshTokenInput })
+                        };
+                        break;
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseDiv.classList.add('success');
+                    
+                    // Sauvegarder les tokens si c'est une connexion ou inscription
+                    if (endpoint === 'login' || endpoint === 'register') {
+                        if (data.tokens) {
+                            accessToken = data.tokens.access;
+                            refreshToken = data.tokens.refresh;
+                            
+                            // Remplir automatiquement les champs de token
+                            const profileTokenInput = document.getElementById('profile-token');
+                            const logoutTokenInput = document.getElementById('logout-refresh-token');
+                            const refreshTokenInput = document.getElementById('refresh-token');
+                            
+                            if (profileTokenInput) profileTokenInput.value = accessToken;
+                            if (logoutTokenInput) logoutTokenInput.value = refreshToken;
+                            if (refreshTokenInput) refreshTokenInput.value = refreshToken;
+                            
+                            responseDiv.textContent = JSON.stringify({
+                                ...data,
+                                note: '✅ Tokens sauvegardés et remplis automatiquement! Vous pouvez maintenant tester les endpoints protégés.'
+                            }, null, 2);
+                        } else {
+                            responseDiv.textContent = JSON.stringify(data, null, 2);
+                        }
+                    } else {
+                        responseDiv.textContent = JSON.stringify(data, null, 2);
+                    }
+                } else {
+                    responseDiv.classList.add('error');
+                    responseDiv.textContent = `Erreur ${response.status}: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                responseDiv.classList.add('error');
+                responseDiv.textContent = `Erreur: ${error.message}`;
+            }
+        }
+
+    </script>
+</body>
+</html>
