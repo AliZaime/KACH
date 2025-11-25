@@ -152,6 +152,101 @@ Authorization: Bearer <access_token>
 
 Le backend est configuré pour accepter les requêtes depuis différentes origines. Modifiez `CORS_ALLOWED_ORIGINS` dans votre fichier `.env` pour ajouter les URLs de vos applications frontend.
 
+## 🔑 Configuration Google Cloud API - Télécharger la clé JSON
+
+Si vous avez besoin de télécharger ou re-télécharger la clé JSON de votre compte de service Google Cloud, suivez ces étapes :
+
+### Méthode 1 : Télécharger une clé existante
+
+1. **Accéder à Google Cloud Console**
+   - Allez sur [Google Cloud Console](https://console.cloud.google.com/)
+   - Connectez-vous avec votre compte Google
+
+2. **Sélectionner le projet**
+   - Dans le menu déroulant en haut, sélectionnez votre projet
+
+3. **Accéder aux comptes de service**
+   - Allez dans **IAM & Admin** > **Service Accounts** (Comptes de service)
+   - Ou utilisez ce lien direct : `https://console.cloud.google.com/iam-admin/serviceaccounts`
+
+4. **Trouver votre compte de service**
+   - Cliquez sur le compte de service que vous souhaitez utiliser
+   - Si vous n'en avez pas, créez-en un nouveau (voir Méthode 2)
+
+5. **Télécharger la clé JSON**
+   - Dans l'onglet **KEYS** (Clés)
+   - Cliquez sur **ADD KEY** > **Create new key** (Créer une nouvelle clé)
+   - Sélectionnez le format **JSON**
+   - Cliquez sur **CREATE** (Créer)
+   - Le fichier JSON sera téléchargé automatiquement
+
+6. **Sauvegarder la clé**
+   - Placez le fichier JSON dans le dossier `KACH/`
+   - **⚠️ IMPORTANT** : Ne commitez jamais ce fichier dans Git (il est déjà dans `.gitignore`)
+   - Renommez-le si nécessaire (ex: `google-credentials.json`)
+
+### Méthode 2 : Créer un nouveau compte de service
+
+Si vous n'avez pas encore de compte de service :
+
+1. **Créer un compte de service**
+   - Dans **IAM & Admin** > **Service Accounts**
+   - Cliquez sur **CREATE SERVICE ACCOUNT** (Créer un compte de service)
+   - Remplissez les informations :
+     - **Service account name** : Nom de votre choix
+     - **Service account ID** : Généré automatiquement
+     - **Description** : Description optionnelle
+   - Cliquez sur **CREATE AND CONTINUE**
+
+2. **Attribuer les rôles** (optionnel)
+   - Ajoutez les rôles nécessaires (ex: Cloud Storage Admin, etc.)
+   - Cliquez sur **CONTINUE** puis **DONE**
+
+3. **Télécharger la clé JSON**
+   - Cliquez sur le compte de service créé
+   - Allez dans l'onglet **KEYS**
+   - Cliquez sur **ADD KEY** > **Create new key**
+   - Sélectionnez **JSON** et cliquez sur **CREATE**
+   - Le fichier sera téléchargé
+
+### Configuration dans votre application
+
+Après avoir téléchargé la clé JSON :
+
+1. **Placer le fichier**
+   ```bash
+   # Placez le fichier dans le dossier KACH/
+   KACH/google-credentials.json
+   ```
+
+2. **Configurer dans .env** (si nécessaire)
+   ```env
+   GOOGLE_APPLICATION_CREDENTIALS=google-credentials.json
+   ```
+
+3. **Ou utiliser directement dans le code**
+   ```python
+   import os
+   from google.oauth2 import service_account
+   
+   credentials = service_account.Credentials.from_service_account_file(
+       'google-credentials.json'
+   )
+   ```
+
+### ⚠️ Sécurité importante
+
+- **Ne jamais** commiter le fichier JSON dans Git
+- **Ne jamais** partager publiquement votre clé JSON
+- Si une clé est compromise, supprimez-la immédiatement dans Google Cloud Console
+- Utilisez des variables d'environnement pour les chemins de fichiers sensibles
+
+### 🔗 Liens utiles
+
+- [Google Cloud Console](https://console.cloud.google.com/)
+- [Documentation Service Accounts](https://cloud.google.com/iam/docs/service-accounts)
+- [Guide d'authentification Google](https://cloud.google.com/docs/authentication)
+
 ## 📁 Structure du projet
 
 ```

@@ -5,21 +5,11 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer pour le modèle User"""
-    avatar_url = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'avatar', 'avatar_url', 'date_joined']
-        read_only_fields = ['id', 'date_joined', 'avatar_url']
-    
-    def get_avatar_url(self, obj):
-        """Retourne l'URL complète de l'avatar"""
-        if obj.avatar:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'date_joined']
+        read_only_fields = ['id', 'date_joined']
 
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
