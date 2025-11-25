@@ -6,11 +6,15 @@ urlpatterns = [
     # Authentification
     path('auth/register/', views.register_user, name='register'),
     path('auth/login/', views.login_user, name='login'),
+    path('auth/google/', views.google_oauth, name='google_oauth'),
     path('auth/logout/', views.logout_user, name='logout'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
     # Profil utilisateur
     path('user/profile/', views.get_user_profile, name='user_profile'),
+    path('user/profile/update/', views.update_user_profile, name='update_user_profile'),
+    path('user/profile/avatar/', views.upload_avatar, name='upload_avatar'),
+    path('user/profile/change-password/', views.change_password, name='change_password'),
     
     # Health check
     path('health/', views.health_check, name='health_check'),

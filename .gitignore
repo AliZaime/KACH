@@ -49,6 +49,13 @@ Thumbs.db
 .env
 .env.local
 
+# Google Cloud Service Account Credentials
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+aerial-grid-*.json
+
 # Coverage
 htmlcov/
 .coverage

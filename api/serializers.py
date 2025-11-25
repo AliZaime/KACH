@@ -5,10 +5,35 @@ from .models import User
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer pour le modèle User"""
+    avatar_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'date_joined']
-        read_only_fields = ['id', 'date_joined']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'avatar', 'avatar_url', 'date_joined']
+        read_only_fields = ['id', 'date_joined', 'avatar_url']
+    
+    def get_avatar_url(self, obj):
+        """Retourne l'URL complète de l'avatar"""
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    """Serializer pour la mise à jour du profil utilisateur"""
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'phone', 'email']
+    
+    def validate_email(self, value):
+        """Vérifier que l'email est unique (sauf pour l'utilisateur actuel)"""
+        user = self.instance
+        if User.objects.filter(email=value).exclude(pk=user.pk).exists():
+            raise serializers.ValidationError("Cet email est déjà utilisé.")
+        return value
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -53,4 +78,28 @@ class LoginSerializer(serializers.Serializer):
         else:
             raise serializers.ValidationError('Veuillez fournir un nom d\'utilisateur et un mot de passe.')
         return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer pour le changement de mot de passe"""
+    old_password = serializers.CharField(write_only=True, required=True)
+    new_password = serializers.CharField(write_only=True, required=True, min_length=8)
+    new_password_confirm = serializers.CharField(write_only=True, required=True, min_length=8)
+    
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['new_password_confirm']:
+            raise serializers.ValidationError({"new_password": "Les nouveaux mots de passe ne correspondent pas."})
+        return attrs
+    
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Le mot de passe actuel est incorrect.")
+        return value
+    
+    def save(self):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user
 
