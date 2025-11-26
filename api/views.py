@@ -221,11 +221,18 @@ def google_oauth(request):
             user = None
             try:
                 user = User.objects.get(google_id=google_id)
+                # Mettre à jour l'avatar si l'utilisateur existe déjà
+                if picture and user.avatar_url != picture:
+                    user.avatar_url = picture
+                    user.save()
             except User.DoesNotExist:
                 try:
                     user = User.objects.get(email=email)
                     if user and not user.google_id:
                         user.google_id = google_id
+                        # Mettre à jour l'avatar si disponible
+                        if picture:
+                            user.avatar_url = picture
                         user.save()
                 except User.DoesNotExist:
                     username = email.split('@')[0]
@@ -241,6 +248,7 @@ def google_oauth(request):
                         first_name=first_name,
                         last_name=last_name,
                         google_id=google_id,
+                        avatar_url=picture,  # Sauvegarder l'image de profil Google
                         is_active=True
                     )
             
@@ -303,12 +311,19 @@ def google_oauth(request):
         user = None
         try:
             user = User.objects.get(google_id=google_id)
+            # Mettre à jour l'avatar si l'utilisateur existe déjà
+            if picture and user.avatar_url != picture:
+                user.avatar_url = picture
+                user.save()
         except User.DoesNotExist:
             try:
                 user = User.objects.get(email=email)
                 # Si l'utilisateur existe mais n'a pas de google_id, l'ajouter
                 if user and not user.google_id:
                     user.google_id = google_id
+                    # Mettre à jour l'avatar si disponible
+                    if picture:
+                        user.avatar_url = picture
                     user.save()
             except User.DoesNotExist:
                 # Créer un nouvel utilisateur
@@ -326,6 +341,7 @@ def google_oauth(request):
                     first_name=first_name,
                     last_name=last_name,
                     google_id=google_id,
+                    avatar_url=picture,  # Sauvegarder l'image de profil Google
                     is_active=True
                 )
         
