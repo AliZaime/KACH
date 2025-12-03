@@ -15,12 +15,51 @@ import io
 import os
 from decouple import config
 
+
+
 User = get_user_model()
 
 
 def home(request):
     """Page d'accueil de l'API"""
     return render(request, 'api/home.html')
+
+# backend/views.py (exemple)
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
+
+from search_engine.search_engine import search  # ✅ on importe ton moteur
+
+
+@require_GET
+def search_products(request):
+    query = request.GET.get("q", "").strip()
+    if not query:
+        return JsonResponse(
+            {"error": "Missing query parameter 'q'"},
+            status=400
+        )
+
+    # Appel à ton moteur
+    results = search(query, k=20)
+
+    # On transforme en JSON propre
+    data = [
+        {
+            "id": p.get("id"),
+            "title": p.get("title"),
+            "brand": p.get("brand"),
+            "price": p.get("price"),
+            "image_url": p.get("image_url"),
+            "product_url": p.get("product_url"),
+            "score": float(score),
+        }
+        for p, score in results
+    ]
+
+    return JsonResponse({"query": query, "results": data}, safe=False)
+
 
 
 @api_view(['GET'])

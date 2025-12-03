@@ -20,5 +20,8 @@ urlpatterns = [
     
     # Speech-to-Text
     path('speech/transcribe/', views.transcribe_audio, name='transcribe_audio'),
+    
+    # Endpoint de recherche
+    path('api/search/', views.search_products),
 ]
 
