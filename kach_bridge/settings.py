@@ -93,8 +93,6 @@ WSGI_APPLICATION = 'kach_bridge.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-import dj_database_url
-
 # Configuration par défaut: SQLite (pour le développement local)
 # Pour utiliser PostgreSQL, configurez les variables d'environnement
 # ou décommentez la configuration PostgreSQL ci-dessous
@@ -122,10 +120,12 @@ DATABASES = {
 # Configuration pour Heroku (utilise DATABASE_URL automatiquement)
 # Activez cette ligne si vous déployez sur Heroku ou si vous avez DATABASE_URL configuré
 if dj_database_url:
-    DATABASES['default'] = dj_database_url.config(
-        default=config('DATABASE_URL', default=''),
-        conn_max_age=600
-    )
+    database_url = config('DATABASE_URL', default='')
+    if database_url:
+        DATABASES['default'] = dj_database_url.config(
+            default=database_url,
+            conn_max_age=600
+        )
 
 
 # Password validation
