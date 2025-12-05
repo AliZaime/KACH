@@ -1,60 +1,79 @@
-# Python
+(# Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+pip-wheel-metadata/
 *.egg-info/
-.installed.cfg
 *.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media
-/staticfiles
+media/
+staticfiles/
 
-# Virtual Environment
-venv/
-env/
-ENV/
-.venv
+# Environment / credentials
+.env
+.env.*
+secrets/
 
-# IDE
+# IDEs and editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
+*.sublime-project
+*.sublime-workspace
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
+desktop.ini
+ehthumbs.db
+Icon
+~$*
 
-# Environment variables
-.env
-.env.local
+# Mypy / type checkers
+.mypy_cache/
 
-# Coverage
-htmlcov/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
+# PyInstaller
+*.manifest
+*.spec
+
+# Sphinx
+docs/_build/
+
+# Node
+node_modules/
+
+# Misc
+.cache/
+__pypackages__/
 
